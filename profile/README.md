@@ -120,23 +120,33 @@ See a production-style example: [Stripe checkout](./examples/stripe-checkout).
 
 ---
 
+## Why Trigora?
+
+Writing a webhook handler, scheduled job, or queue consumer is usually the easy part. Running it in production means dealing with deployments, secrets, logs, infrastructure, scheduling, workers, and observability.
+
+Trigora handles the operational layer so you can focus on the code that runs when something happens.
+
+---
+
 ## Everything around your workflow, included
 
-**Deployments** — Ship flows directly from the CLI.
+**Webhooks** — Receive HTTP events through hosted endpoints.
+
+**Cron** — Run workflows on a schedule.
 
 **Queues** — Run asynchronous background work without managing workers.
+
+**Deployments** — Ship flows directly from the CLI.
 
 **Secrets** — Manage environment secrets from the control plane.
 
 **Observability** — Inspect invocations and structured logs.
 
-**Cron** — Run scheduled workflows.
-
 **Custom domains** — Expose webhook flows through your own domain.
 
 ---
 
-## Install
+## Quick start
 
 ```bash
 npm install trigora @trigora/sdk
@@ -177,6 +187,8 @@ This repository contains the public Trigora packages and examples. The hosted co
 - [Getting Started](https://trigora.dev/docs/getting-started)
 - [Deploy](https://trigora.dev/docs/guides/deploy)
 - [Webhook Endpoints](https://trigora.dev/docs/guides/webhook-endpoints)
+- [Cron](https://trigora.dev/docs/guides/cron)
+- [Queues](https://trigora.dev/docs/guides/queues)
 - [Custom Domains](https://trigora.dev/docs/guides/custom-domains)
 - [CLI Reference](https://trigora.dev/docs/reference/cli)
 - [API Reference](https://trigora.dev/docs/reference/api)
