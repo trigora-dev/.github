@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://trigora.dev">
-    <img src="https://trigora.dev/banner.png?v=2" alt="Trigora — durable execution, without replay." width="100%" />
+    <img src="https://trigora.dev/trigora-banner.png" alt="Trigora — durable execution without history replay." width="100%" />
   </a>
 </p>
 
@@ -11,68 +11,188 @@
   <a href="https://github.com/trigora-dev/trigora/stargazers"><img src="https://img.shields.io/github/stars/trigora-dev/trigora" alt="GitHub stars" /></a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/trigora-dev/trigora-typescript"><b>TypeScript</b></a>
+  ·
+  <a href="https://github.com/trigora-dev/trigora-python"><b>Python</b></a>
+  ·
+  <a href="https://github.com/trigora-dev/trigora-rust"><b>Rust</b></a>
+  ·
+  <a href="https://github.com/trigora-dev/tcc-engine"><b>TCC Engine</b></a>
+  ·
+  <a href="https://cloud.trigora.dev"><b>Cloud</b></a>
+</p>
+
 # Trigora
 
-**Durable execution, without replay.**
+**Durable execution without history replay.**
 
-Trigora is a durable execution substrate for long-running agents and dynamic software.
+Trigora is a durable execution platform for long-lived AI agents and programs.
 
-Its underlying execution architecture—**Transparent Continuation Checkpointing (TCC)**—preserves resumable program state at durable boundaries. Recovery from a committed continuation checkpoint does not require replaying the accumulated execution-history prefix.
+Write normal application logic in **TypeScript, Python, or Rust**. Trigora can suspend execution across events, timers, external effects, and child programs, then recover from committed continuation state after failure without replaying completed execution history.
 
 ```ts
-import {
-  effect,
-  invoke,
-  waitForEvent,
-} from "@trigora/sdk";
+import { effect, waitForEvent } from "@trigora/sdk";
 
-export async function researchAgent(input: ResearchInput) {
-  const sources = await effect(() =>
-    searchWeb(input.query)
-  );
+export default async function approval() {
+  const result = await effect("generate", () => 42);
 
-  const analysis = await invoke(analyzeSources, {
-    sources,
-  });
+  const review = await waitForEvent("approved");
 
-  await waitForEvent("human.approved");
-
-  return effect(() => publishReport(analysis));
+  return { result, review };
 }
 ```
 
-Trigora is designed for programs that:
+Deploy it once. Start executions from the CLI, an API call, a webhook, or a cron trigger. Let them run for seconds, hours, or days.
 
-- call tools and external systems;
-- wait for humans or events;
-- invoke durable child executions;
+## Why Trigora?
+
+Traditional durable workflow systems often reconstruct execution state by replaying prior history.
+
+Trigora uses **Transparent Continuation Checkpointing (TCC)** instead.
+
+At durable boundaries, TCC commits the program position and the live durable state required to continue. Recovery resumes from that committed continuation rather than re-executing the completed prefix.
+
+That makes Trigora a natural fit for workloads that:
+
+- run long-lived AI agents;
+- call models, tools, APIs, and external systems;
+- wait for humans or external events;
+- sleep for minutes, hours, or days;
+- coordinate durable child executions;
 - branch dynamically;
-- survive for hours or days;
-- recover after worker failure.
+- need to survive worker or process failure.
 
-Cron, webhooks, queues, and API calls act as **triggers** that start durable executions rather than separate programming models.
+[How TCC works →](https://trigora.dev/research)  
+[Read the technical report →](https://trigora.dev/research/whitepaper)
 
-## Status
+## Start building
 
-Trigora is under active development.
+Install the SDK, client, and CLI for your language.
 
-The TCC research engine and evaluation prototype exist today, including a public [demo](https://demo.trigora.dev). The public SDK, CLI, and managed Trigora Cloud platform are being built. Some code in this repository still reflects Trigora’s earlier event-execution product and should not be considered the final durable-execution API.
+### TypeScript
+
+```sh
+npm install @trigora/sdk @trigora/client trigora
+```
+
+### Python
+
+```sh
+pip install trigora trigora-client trigora-cli
+```
+
+### Rust
+
+```sh
+cargo add trigora trigora-client
+cargo install trigora-cli
+```
+
+Then initialize a project:
+
+```sh
+trigora init
+```
+
+Start the local runtime:
+
+```sh
+trigora dev
+```
+
+When you're ready to run in production:
+
+```sh
+trigora deploy
+```
+
+[Read the quickstart →](https://trigora.dev/docs/quickstart)
+
+## Trigora Cloud
+
+**Trigora Cloud** is the managed production runtime for TCC programs.
+
+It provides:
+
+- durable execution;
+- deployment and program versioning;
+- events and timers;
+- cron and webhook triggers;
+- project secrets;
+- execution inspection and observability;
+- workspace access and API tokens;
+- managed persistence and recovery.
+
+Start at **[cloud.trigora.dev](https://cloud.trigora.dev)**.
+
+## Repository map
+
+Trigora is split into focused repositories.
+
+| Repository | What it contains |
+| --- | --- |
+| **[trigora](https://github.com/trigora-dev/trigora)** | CLI, local runtime, public contracts, and ecosystem entry point |
+| **[trigora-typescript](https://github.com/trigora-dev/trigora-typescript)** | TypeScript authoring SDK and API client |
+| **[trigora-python](https://github.com/trigora-dev/trigora-python)** | Python authoring SDK and API client |
+| **[trigora-rust](https://github.com/trigora-dev/trigora-rust)** | Rust authoring SDK and API client |
+| **[tcc-engine](https://github.com/trigora-dev/tcc-engine)** | Portable TCC execution engine, language frontends, host protocol, and specifications |
+
+### This repository
+
+`trigora-dev/trigora` contains the pieces shared across the Trigora ecosystem:
+
+- the `trigora` CLI;
+- the native local runtime used by `trigora dev`;
+- shared public contracts;
+- release coordination for the Trigora SDK ecosystem.
+
+Language-specific authoring APIs live in their respective repositories above.
+
+## TCC Engine
+
+**TCC Engine** is the portable execution technology underneath Trigora.
+
+It is implemented primarily in Rust, supports native and WebAssembly embedding, and has declared frontends for TypeScript, Python, and Rust.
+
+The engine is available separately for teams that want to embed TCC into their own runtimes or infrastructure.
+
+[TCC Engine on GitHub →](https://github.com/trigora-dev/tcc-engine)
+
+TCC Engine is source-available under the Business Source License 1.1 and converts to Apache 2.0 under its license terms. The Trigora SDKs, clients, CLI, and public contracts are MIT licensed.
 
 ## Research
 
-In a controlled evaluation at fixed live state:
+The public research covers:
 
-- TCC recovery remained approximately **0.6–0.9 ms** across history depths from 10 to 1,000.
-- No semantic failures were observed across **50,000 generated cases** within the tested TypeScript subset.
+- continuation-based recovery;
+- matched recovery versus history replay;
+- live-state scaling;
+- crash recovery and fresh-process restore;
+- frontend semantics;
+- host responsibilities;
+- limitations and failure windows.
 
-These are research-prototype measurements, not production performance guarantees.
+**[Technical report →](https://trigora.dev/research/whitepaper)**  
 
-Crash an executor and restore from a committed continuation in the [TCC demo](https://demo.trigora.dev). The demo is a research demonstration, not the hosted product.
+## Links
 
-[Read the research](https://trigora.dev/research) · [Technical report](https://trigora.dev/research/whitepaper) · [Limitations](https://trigora.dev/research/limitations) · [Demo](https://demo.trigora.dev)
+- **Website:** [trigora.dev](https://trigora.dev)
+- **Cloud:** [cloud.trigora.dev](https://cloud.trigora.dev)
+- **Docs:** [trigora.dev/docs](https://trigora.dev/docs)
+- **Research:** [trigora.dev/research](https://trigora.dev/research)
+- **TCC Engine:** [github.com/trigora-dev/tcc-engine](https://github.com/trigora-dev/tcc-engine)
+- **GitHub:** [github.com/trigora-dev/trigora](https://github.com/trigora-dev/trigora)
 
-## Learn more
+## Company
 
-[Website](https://trigora.dev) · [Technology](https://trigora.dev/technology) · [Documentation](https://trigora.dev/docs) · [Demo](https://demo.trigora.dev) · [Design partners](https://trigora.dev/early-access)
+Trigora is built by **Trigora, Inc.**
 
-Building a workload that needs durable execution? Contact [omar@trigora.dev](mailto:omar@trigora.dev).
+- For general inquiries: [info@trigora.dev](mailto:info@trigora.dev)
+- For product questions and support: [support@trigora.dev](mailto:support@trigora.dev)  
+- For commercial terms: [sales@trigora.dev](mailto:sales@trigora.dev)  
+- For security reports: [security@trigora.dev](mailto:security@trigora.dev)
+
+## License
+
+MIT © 2026 Trigora, Inc.
